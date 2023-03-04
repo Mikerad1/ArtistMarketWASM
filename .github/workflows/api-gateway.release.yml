@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: api-gateway-actor
-          path: build/*.wasm
+          path: ./Backend/APIGateway/api-gateway/build/*.wasm
 
   github_release:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
