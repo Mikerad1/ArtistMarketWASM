@@ -3,6 +3,10 @@ on:
   workflow_dispatch:
   push:
     branches: [master]
+    paths:
+      - "./Frontend/UI/**"
+      - "./Frontend/UI/src/**"
+      - "./Frontend/UI/Cargo.*"
     tags:
       - "v*"
 env:

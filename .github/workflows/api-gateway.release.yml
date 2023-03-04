@@ -3,6 +3,10 @@ on:
   workflow_dispatch:
   push:
     branches: [master]
+    paths:
+      - "./Backend/APIGateway/api-gateway/**"
+      - "./Backend/APIGateway/api-gateway/src/**"
+      - "./Backend/APIGateway/api-gateway/Cargo.*"
     tags:
       - "v*"
 env:
@@ -35,6 +39,7 @@ jobs:
         with:
           name: api-gateway-actor
           path: ./build/*.wasm
+        run: ls
 
   github_release:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
