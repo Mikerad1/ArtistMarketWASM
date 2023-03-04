@@ -12,7 +12,7 @@ on:
 env:
   # For the release action, you'll have to set the following variables
   WASH_ISSUER_KEY: ${{ secrets.WASH_ISSUER_KEY }}
-  WASH_SUBJECT_KEY: ${{ secrets.WASH_SUBJECT_KEY }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASH_SUBJECT_KEY_FRONTEND_UI }}
   WASMCLOUD_PAT: ${{ secrets.WASMCLOUD_PAT }}
 jobs:
   build_signed_actor:
@@ -26,13 +26,13 @@ jobs:
       # the two lines below to automatically run tests
       # - name: Test actor
       #   run: cargo test --target x86_64-unknown-linux-gnu -- --nocapture
+      - name: Change directory
+        run: cd ./Frontend/UI
       - name: Build and sign wasmCloud actor
         env:
           WASH_ISSUER_KEY: ${{ env.WASH_ISSUER_KEY }}
           WASH_SUBJECT_KEY: ${{ env.WASH_SUBJECT_KEY }}
-        run: |
-          cd ./Frontend/UI
-          make
+        run: make
       - name: Upload signed actor to GH Actions
         uses: actions/upload-artifact@v2
         with:
@@ -46,8 +46,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: wasmcloud/common-actions/install-wash@main
-      - name: Change directory
-        run: cd ./Frontend/UI
       - name: Download signed actor
         uses: actions/download-artifact@v2
         with:
@@ -77,8 +75,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: wasmcloud/common-actions/install-wash@main
-      - name: Change directory
-        run: cd ./Frontend/UI
       - name: Download signed actor
         uses: actions/download-artifact@v2
         with:
