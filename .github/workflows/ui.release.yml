@@ -1,4 +1,4 @@
-name: Release to GHCR
+name: UI Release to GHCR
 on:
   workflow_dispatch:
   push:
