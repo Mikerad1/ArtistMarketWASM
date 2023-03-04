@@ -75,6 +75,9 @@ jobs:
   artifact_release:
     needs: build_signed_actor
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Backend/APIGateway/api-gateway
     steps:
       - uses: actions/checkout@v2
       - uses: wasmcloud/common-actions/install-wash@main
