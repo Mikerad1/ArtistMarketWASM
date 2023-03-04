@@ -4,9 +4,9 @@ on:
   push:
     branches: [master]
     paths:
-      - "../../../Backend/APIGateway/api-gateway/**"
-      - "../../../Backend/APIGateway/api-gateway/src/**"
-      - "../../../Backend/APIGateway/api-gateway/Cargo.*"
+      - "../../Backend/APIGateway/api-gateway/**"
+      - "../../Backend/APIGateway/api-gateway/src/**"
+      - "../../Backend/APIGateway/api-gateway/Cargo.*"
     tags:
       - "v*"
 env:

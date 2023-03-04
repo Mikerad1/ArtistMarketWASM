@@ -3,8 +3,8 @@ on:
   pull_request:
     branches: [master]
     paths:
-      - "../../../src/Frontend/UI/**"
-      - "../../../src/Frontend/UI/Cargo.*"
+      - "../../src/Frontend/UI/**"
+      - "../../src/Frontend/UI/Cargo.*"
 jobs:
   build_and_test:
     runs-on: ubuntu-latest

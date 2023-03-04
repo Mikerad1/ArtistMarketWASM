@@ -3,8 +3,8 @@ on:
   pull_request:
     branches: [master]
     paths:
-      - "../../../Backend/APIGateway/api-gateway/src/**"
-      - "../../../Backend/APIGateway/api-gateway/Cargo.*"
+      - "../../Backend/APIGateway/api-gateway/src/**"
+      - "../../Backend/APIGateway/api-gateway/Cargo.*"
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
