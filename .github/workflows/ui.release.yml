@@ -3,10 +3,6 @@ on:
   workflow_dispatch:
   push:
     branches: [master]
-    paths:
-      - "../../Frontend/UI/src/**"
-      - "../../Frontend/UI/src/src/**"
-      - "../../Frontend/UI/src/Cargo.*"
     tags:
       - "v*"
 env:
@@ -30,7 +26,9 @@ jobs:
         env:
           WASH_ISSUER_KEY: ${{ env.WASH_ISSUER_KEY }}
           WASH_SUBJECT_KEY: ${{ env.WASH_SUBJECT_KEY }}
-        run: make
+        run: |
+          cd ./Backend/APIGateway/api-gateway 
+          make
       - name: Upload signed actor to GH Actions
         uses: actions/upload-artifact@v2
         with:

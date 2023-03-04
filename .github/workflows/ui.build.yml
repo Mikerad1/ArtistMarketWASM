@@ -2,9 +2,6 @@ name: UI Build and test
 on:
   pull_request:
     branches: [master]
-    paths:
-      - "/Frontend/UI/src/**"
-      - "/Frontend/UI/src/Cargo.*"
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
@@ -12,6 +9,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Add wasm32-unknown-unknown
         run: rustup target add wasm32-unknown-unknown
+      - name: Change directory
+        run: cd ./Frontend/UI
       - name: Check formatting
         run: cargo fmt -- --check
         shell: bash

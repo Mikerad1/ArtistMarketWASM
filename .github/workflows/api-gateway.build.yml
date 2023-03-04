@@ -2,9 +2,6 @@ name: API Gateway Build and test
 on:
   pull_request:
     branches: [master]
-    paths:
-      - "/Backend/APIGateway/api-gateway/src/**"
-      - "/Backend/APIGateway/api-gateway/Cargo.*"
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
@@ -12,6 +9,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Add wasm32-unknown-unknown
         run: rustup target add wasm32-unknown-unknown
+      - name: Change directory
+        run: cd ./Backend/APIGateway/api-gateway 
       - name: Check formatting
         run: cargo fmt -- --check
         shell: bash
