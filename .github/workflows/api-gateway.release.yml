@@ -34,12 +34,13 @@ jobs:
           cd ./Backend/APIGateway/api-gateway 
           make
           ls
+      - name: test
+        run: ls
       - name: Upload signed actor to GH Actions
         uses: actions/upload-artifact@v2
         with:
           name: api-gateway-actor
           path: ./build/*.wasm
-        run: ls
 
   github_release:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
