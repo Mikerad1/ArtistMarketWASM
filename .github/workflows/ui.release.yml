@@ -4,9 +4,9 @@ on:
   push:
     branches: [master]
     paths:
-      - "./Frontend/UI/**"
-      - "./Frontend/UI/src/**"
-      - "./Frontend/UI/Cargo.*"
+      - "./Frontend/UI-Actor/**"
+      - "./Frontend/UI-Actor/src/**"
+      - "./Frontend/UI-Actor/Cargo.*"
     tags:
       - "v*"
 env:

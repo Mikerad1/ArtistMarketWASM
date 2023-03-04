@@ -2,6 +2,9 @@ name: UI Build and test
 on:
   pull_request:
     branches: [master]
+    paths:
+      - "./Frontend/UI-Actor/src/**"
+      - "./Frontend/UI-Actor/Cargo.*"
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
