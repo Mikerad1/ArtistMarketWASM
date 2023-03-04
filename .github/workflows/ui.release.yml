@@ -86,10 +86,12 @@ jobs:
       - name: Determine actor name
         run: |
           echo "actor-name=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].name')" >> $GITHUB_ENV
+        working-directory: ./Frontend/UI
       - name: Determine actor version
         if: startswith(github.ref, 'refs/tags/') # Only run on tag push
         run: |
           echo "actor-version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')" >> $GITHUB_ENV
+        working-directory: ./Frontend/UI
       - name: Determine actor version (main)
         if: ${{ !startswith(github.ref, 'refs/tags/') }}
         run: |
@@ -99,4 +101,4 @@ jobs:
           WASH_REG_USER: ${{ github.repository_owner }}
           WASH_REG_PASSWORD: ${{ secrets.WASMCLOUD_PAT }}
         run: |
-          wash reg push ghcr.io/${{ github.REPOSITORY }}:${{ env.actor-version }} build/${{ env.actor-name }}_s.wasm -a org.opencontainers.image.source=https://github.com/${{ github.REPOSITORY }} --allow-latest
+          wash reg push ghcr.io/${{ github.REPOSITORY }}-${{ env.actor-name }}:${{ env.actor-version }} build/${{ env.actor-name }}_s.wasm -a org.opencontainers.image.source=https://github.com/${{ github.REPOSITORY }} --allow-latest
