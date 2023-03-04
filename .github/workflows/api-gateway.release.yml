@@ -29,11 +29,12 @@ jobs:
         run: |
           cd ./Backend/APIGateway/api-gateway 
           make
+          ls
       - name: Upload signed actor to GH Actions
         uses: actions/upload-artifact@v2
         with:
-          name: wasmcloud-actor
-          path: build/*.wasm
+          name: api-gateway-actor
+          path: ./build/*.wasm
 
   github_release:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
