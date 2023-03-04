@@ -77,7 +77,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./Backend/APIGateway/api-gateway
+        
     steps:
       - uses: actions/checkout@v2
       - uses: wasmcloud/common-actions/install-wash@main
@@ -89,10 +89,12 @@ jobs:
       - name: Determine actor name
         run: |
           echo "actor-name=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].name')" >> $GITHUB_ENV
+        working-directory: ./Backend/APIGateway/api-gateway
       - name: Determine actor version
         if: startswith(github.ref, 'refs/tags/') # Only run on tag push
         run: |
           echo "actor-version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')" >> $GITHUB_ENV
+        working-directory: ./Backend/APIGateway/api-gateway
       - name: Determine actor version (main)
         if: ${{ !startswith(github.ref, 'refs/tags/') }}
         run: |
