@@ -29,8 +29,6 @@ jobs:
       # the two lines below to automatically run tests
       # - name: Test actor
       #   run: cargo test --target x86_64-unknown-linux-gnu -- --nocapture
-      - name: Change directory
-        run: cd ./Frontend/UI
       - name: Build and sign wasmCloud actor
         env:
           WASH_ISSUER_KEY: ${{ env.WASH_ISSUER_KEY }}
@@ -66,7 +64,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/*.wasm
+          files: /Frontend/UI/build/*.wasm
           token: ${{ env.WASMCLOUD_PAT }}
           body_path: release.txt
           prerelease: false
