@@ -1,10 +1,10 @@
-name: UI Build and test
+name: API Gateway Build and test
 on:
   pull_request:
     branches: [master]
     paths:
-      - "./Frontend/UI-Actor/src/**"
-      - "./Frontend/UI-Actor/Cargo.*"
+      - "./Backend/artistmarket/src/**"
+      - "./Backend/artistmarket/Cargo.*"
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
@@ -13,7 +13,7 @@ jobs:
       - name: Add wasm32-unknown-unknown
         run: rustup target add wasm32-unknown-unknown
       - name: Change directory
-        run: cd ./Frontend/UI
+        run: cd ./Backend/artistmarket 
       - name: Check formatting
         run: cargo fmt -- --check
         shell: bash

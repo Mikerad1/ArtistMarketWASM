@@ -1,25 +1,25 @@
-name: UI Release to GHCR
+name: API Gateway Release to GHCR
 on:
   workflow_dispatch:
   push:
     branches: [master]
     paths:
-      - "./Frontend/UI-Actor/**"
-      - "./Frontend/UI-Actor/src/**"
-      - "./Frontend/UI-Actor/Cargo.*"
+      - "./Backend/artistmarket/**"
+      - "./Backend/artistmarket/src/**"
+      - "./Backend/artistmarket/Cargo.*"
     tags:
       - "v*"
 env:
   # For the release action, you'll have to set the following variables
   WASH_ISSUER_KEY: ${{ secrets.WASH_ISSUER_KEY }}
-  WASH_SUBJECT_KEY: ${{ secrets.WASH_SUBJECT_KEY_FRONTEND_UI }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASH_SUBJECT_KEY }}
   WASMCLOUD_PAT: ${{ secrets.WASMCLOUD_PAT }}
 jobs:
   build_signed_actor:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./Frontend/UI
+        working-directory: ./Backend/artistmarket
     steps:
       - uses: actions/checkout@v2
       - uses: wasmcloud/common-actions/install-wash@main
@@ -34,11 +34,13 @@ jobs:
           WASH_ISSUER_KEY: ${{ env.WASH_ISSUER_KEY }}
           WASH_SUBJECT_KEY: ${{ env.WASH_SUBJECT_KEY }}
         run: make
+      - name: test
+        run: ls
       - name: Upload signed actor to GH Actions
         uses: actions/upload-artifact@v2
         with:
-          name: wasmcloud-actor
-          path: ./Frontend/UI/build/*.wasm
+          name: api-gateway-actor
+          path: ./Backend/artistmarket/build/*.wasm
 
   github_release:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
@@ -50,7 +52,7 @@ jobs:
       - name: Download signed actor
         uses: actions/download-artifact@v2
         with:
-          name: wasmcloud-actor
+          name: api-gateway-actor
           path: build
       - name: Create release text
         run: |
@@ -64,7 +66,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: /Frontend/UI/build/*.wasm
+          files: ./Backend/artistmarket/build/*.wasm
           token: ${{ env.WASMCLOUD_PAT }}
           body_path: release.txt
           prerelease: false
@@ -79,17 +81,17 @@ jobs:
       - name: Download signed actor
         uses: actions/download-artifact@v2
         with:
-          name: wasmcloud-actor
+          name: api-gateway-actor
           path: build
       - name: Determine actor name
         run: |
           echo "actor-name=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].name')" >> $GITHUB_ENV
-        working-directory: ./Frontend/UI
+        working-directory: ./Backend/artistmarket
       - name: Determine actor version
         if: startswith(github.ref, 'refs/tags/') # Only run on tag push
         run: |
           echo "actor-version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')" >> $GITHUB_ENV
-        working-directory: ./Frontend/UI
+        working-directory: ./Backend/artistmarket
       - name: Determine actor version (main)
         if: ${{ !startswith(github.ref, 'refs/tags/') }}
         run: |
