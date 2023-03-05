@@ -1,4 +1,4 @@
-name = "api_gateway"
+name = "artistmarket"
 language = "rust"
 type = "actor"
 version = "0.1.0"

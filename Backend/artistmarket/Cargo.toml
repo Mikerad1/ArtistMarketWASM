@@ -1,12 +1,12 @@
 [package]
-name = "api_gateway"
+name = "artistmarket"
 version = "0.1.0"
 authors = [ "" ]
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-name = "api_gateway"
+name = "artistmarket"
 
 [dependencies]
 futures = "0.3"
