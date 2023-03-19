@@ -32,7 +32,7 @@ jobs:
       - name: Build and sign wasmCloud actor
         env:
           WASH_ISSUER_KEY: ${{ env.WASH_ISSUER_KEY }}
-          WASH_SUBJECT_KEY: ${{ env.WASH_SUBJECT_KEY_BACKEND_API_GATEWAY }}
+          WASH_SUBJECT_KEY: ${{ env.WASH_SUBJECT_KEY }}
         run: make
       - name: test
         run: ls
