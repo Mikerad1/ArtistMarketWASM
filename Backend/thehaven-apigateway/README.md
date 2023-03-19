@@ -1,4 +1,4 @@
-# artistmarket Actor
+# thehaven_apigateway Actor
 
 This project implements an actor that returns a greeting.
 
@@ -30,7 +30,7 @@ registry. Check that `REG_URL` setting in Makefile is correct, and run
 and start the actor.
 Alternately, you can load and start the actor from the host's web ui.
 When prompted for the path,
-select `build/artistmarket_s.wasm`.
+select `build/thehaven_apigateway_s.wasm`.
 
 The actor must be linked with an HttpServer capability
 provider with the contract id `wasmcloud:httpserver`. You can start the

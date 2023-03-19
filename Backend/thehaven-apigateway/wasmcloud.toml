@@ -1,4 +1,4 @@
-name = "artistmarket"
+name = "thehaven_apigateway"
 language = "rust"
 type = "actor"
 version = "0.1.0"
