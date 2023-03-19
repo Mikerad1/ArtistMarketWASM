@@ -4,22 +4,22 @@ on:
   push:
     branches: [master]
     paths:
-      - "./Backend/artistmarket/**"
-      - "./Backend/artistmarket/src/**"
-      - "./Backend/artistmarket/Cargo.*"
+      - "./Backend/thehaven-apigateway/**"
+      - "./Backend/thehaven-apigateway/src/**"
+      - "./Backend/thehaven-apigateway/Cargo.*"
     tags:
       - "v*"
 env:
   # For the release action, you'll have to set the following variables
   WASH_ISSUER_KEY: ${{ secrets.WASH_ISSUER_KEY }}
-  WASH_SUBJECT_KEY: ${{ secrets.WASH_SUBJECT_KEY }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASH_SUBJECT_KEY_BACKEND_API_GATEWAY }}
   WASMCLOUD_PAT: ${{ secrets.WASMCLOUD_PAT }}
 jobs:
   build_signed_actor:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./Backend/artistmarket
+        working-directory: ./Backend/thehaven-apigateway
     steps:
       - uses: actions/checkout@v2
       - uses: wasmcloud/common-actions/install-wash@main
@@ -32,7 +32,7 @@ jobs:
       - name: Build and sign wasmCloud actor
         env:
           WASH_ISSUER_KEY: ${{ env.WASH_ISSUER_KEY }}
-          WASH_SUBJECT_KEY: ${{ env.WASH_SUBJECT_KEY }}
+          WASH_SUBJECT_KEY: ${{ env.WASH_SUBJECT_KEY_BACKEND_API_GATEWAY }}
         run: make
       - name: test
         run: ls
@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: api-gateway-actor
-          path: ./Backend/artistmarket/build/*.wasm
+          path: ./Backend/thehaven-apigateway/build/*.wasm
 
   github_release:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
@@ -66,7 +66,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ./Backend/artistmarket/build/*.wasm
+          files: ./Backend/thehaven-apigateway/build/*.wasm
           token: ${{ env.WASMCLOUD_PAT }}
           body_path: release.txt
           prerelease: false
@@ -86,12 +86,12 @@ jobs:
       - name: Determine actor name
         run: |
           echo "actor-name=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].name')" >> $GITHUB_ENV
-        working-directory: ./Backend/artistmarket
+        working-directory: ./Backend/thehaven-apigateway
       - name: Determine actor version
         if: startswith(github.ref, 'refs/tags/') # Only run on tag push
         run: |
           echo "actor-version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')" >> $GITHUB_ENV
-        working-directory: ./Backend/artistmarket
+        working-directory: ./Backend/thehaven-apigateway
       - name: Determine actor version (main)
         if: ${{ !startswith(github.ref, 'refs/tags/') }}
         run: |
