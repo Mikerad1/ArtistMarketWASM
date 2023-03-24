@@ -1,0 +1,29 @@
+name: API Gateway Build and test
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - "./Backend/thehaven-auth/src/**"
+      - "./Backend/thehaven-auth/Cargo.*"
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Add wasm32-unknown-unknown
+        run: rustup target add wasm32-unknown-unknown
+      - name: Change directory
+        run: cd ./Backend/thehaven-auth 
+      - name: Check formatting
+        run: cargo fmt -- --check
+        shell: bash
+      - name: Build actor
+        run: cargo build
+      - name: Check lints with clippy
+        run: |
+          rustup component add clippy
+          cargo clippy
+      # Once you've written unit tests for your actor, you can uncomment
+      # the two lines below to automatically run tests
+      # - name: Test actor
+      #   run: cargo test --target x86_64-unknown-linux-gnu -- --nocapture
