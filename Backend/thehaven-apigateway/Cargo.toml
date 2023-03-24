@@ -15,6 +15,8 @@ wasmbus-rpc = "0.11"
 wasmcloud-interface-httpserver = "0.8"
 wasmcloud-interface-logging = "0.8"
 thehaven_interfaces = { path = "../../Interfaces/thehaven-interfaces/rust" }
+serde = {version = "1.0", features = ["derive"]}
+serde_json = "1.0.68"
 
 [profile.release]
 # Optimize for small code size

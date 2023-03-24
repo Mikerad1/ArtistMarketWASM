@@ -1,9 +1,9 @@
 use std::{str::FromStr, time::SystemTime};
 
-use chrono::{DateTime, NaiveDateTime, Utc};
 use jwt_provider::*;
-use models::dbModels::{user::user::UserDB, role::role::RoleDB};
+use models::db_models::{user::{user::UserDB, self}, role::{role::RoleDB, self}};
 use thehaven_interfaces::*;
+use time::{ Date, OffsetDateTime, format_description};
 use wasmbus_rpc::{actor::prelude::*, minicbor::decode, Timestamp};
 use wasmcloud_interface_numbergen::{generate_guid, random_in_range};
 use wasmcloud_interface_sqldb::{SqlDb, SqlDbError, SqlDbSender};
@@ -15,6 +15,33 @@ struct ThehavenAuthActor {}
 
 #[async_trait]
 impl Auth for ThehavenAuthActor {
+
+    async fn init_tables(&self, ctx: &Context) -> RpcResult<bool> {
+        let db = SqlDbSender::new();
+        user::user::init_table(ctx, &db).await?;
+        role::role::init_table(ctx, &db).await?;
+        Ok(true)
+    }
+
+    async fn get_roles(&self, ctx: &Context) -> RpcResult<Vec<thehaven_interfaces::Role>> {
+        let db = SqlDbSender::new();
+        let resp = db
+            .query(ctx, &format!(r#"select * from {};"#, "Roles").into())
+            .await?;
+
+        let rows: Vec<RoleDB> = decode(&resp.rows)?;
+        let mut roles: Vec<thehaven_interfaces::Role> = Vec::new();
+        for row in rows {
+            let role = thehaven_interfaces::Role {
+                id: row.id,
+                name: row.name
+            };
+            roles.push(role);
+        }
+
+        Ok(roles)
+    }
+
     async fn get_user_role<TS: ToString + ?Sized + Sync>(
         &self,
         ctx: &Context,
@@ -82,11 +109,15 @@ impl Auth for ThehavenAuthActor {
             &argon2::Config::default(),
         )
         .unwrap();
-        let resp = db.execute(ctx, &format!(
+        let format = time::format_description::parse(
+            "[year]-[month]-[day] [hour]:[minute]:[second] [offset_hour \
+                sign:mandatory]:[offset_minute]:[offset_second]"
+        ).unwrap();
+        db.execute(ctx, &format!(
             r#"
             insert into {} (id, username, password, email, created_at, updated_at, id_number, first_name, last_name, phone_number, address, gender, role_id)
             values ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');
-            "#, "Users", id, msg.username, hashed_password, msg.email, DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp_opt(0, msg.created_at.as_nanos().try_into().unwrap()).unwrap(), Utc), DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp_opt(0, msg.updated_at.as_nanos().try_into().unwrap()).unwrap(), Utc), msg.id_number, msg.first_name, msg.last_name, msg.phone_number, msg.address, msg.gender, msg.role_id
+            "#, "Users", id, msg.username, hashed_password, msg.email, OffsetDateTime::from_unix_timestamp(msg.created_at.as_nanos().try_into().unwrap()).unwrap(), OffsetDateTime::from_unix_timestamp(msg.updated_at.as_nanos().try_into().unwrap()).unwrap(), msg.id_number, msg.first_name, msg.last_name, msg.phone_number, msg.address, msg.gender, msg.role_id
         ).into())
         .await?;
 
@@ -129,19 +160,24 @@ impl Auth for ThehavenAuthActor {
 
         let mut rows: Vec<UserDB> = decode(&resp.rows)?;
         let user = rows.remove(0);
-        let passwordResult = argon2::verify_encoded(&user.password, msg.password.as_bytes())
+        let password_result = argon2::verify_encoded(&user.password, msg.password.as_bytes())
             .map_err(|_| SqlDbError::new("invalidPassword", "Invalid password".to_string()));
 
-        if passwordResult.unwrap() {
+        if password_result.unwrap() {
+            let format = format_description::parse(
+                "[year]-[month]-[day] [hour]:[minute]:[second] [offset_hour \
+                     sign:mandatory]:[offset_minute]:[offset_second]"
+            ).unwrap();
+            
             let jwt_provider = JwtHandlerSender::new();
             let jwt_user = jwt_provider::User {
                 id: user.id.clone(),
                 email: user.email.clone(),
                 created_at: Timestamp::from(SystemTime::from(
-                    DateTime::<Utc>::from_str(user.created_at.as_str()).unwrap(),
+                    OffsetDateTime::parse(user.created_at.as_str(), &format).unwrap(),
                 )),
                 updated_at: Timestamp::from(SystemTime::from(
-                    DateTime::<Utc>::from_str(user.updated_at.as_str()).unwrap(),
+                    OffsetDateTime::parse(user.updated_at.as_str(), &format).unwrap(),
                 )),
                 first_name: Some(user.first_name.clone()),
                 last_name: Some(user.last_name.clone()),

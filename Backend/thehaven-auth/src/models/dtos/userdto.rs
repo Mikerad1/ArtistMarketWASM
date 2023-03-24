@@ -1,7 +1,6 @@
 pub(crate) mod userdto {
     use serde::{Serialize, Deserialize};
-    use crate::models::dbModels::user::user::UserDB;
-    use chrono::{Utc};
+    use crate::models::db_models::user::user::UserDB;
 
     #[derive(Serialize, Deserialize)]
     pub struct UserDTO{
@@ -37,8 +36,8 @@ pub(crate) mod userdto {
                 username,
                 password,
                 email,
-                created_at: Utc::now().naive_utc().to_string(),
-                updated_at: Utc::now().naive_utc().to_string(),
+                created_at: time::OffsetDateTime::now_utc().to_string(),
+                updated_at: time::OffsetDateTime::now_utc().to_string(),
                 id_number,
                 first_name,
                 last_name,
