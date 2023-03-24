@@ -1,0 +1,28 @@
+[package]
+name = "thehaven_auth"
+version = "0.1.0"
+authors = [ "Michael Rademeyer" ]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "thehaven_auth"
+
+[dependencies]
+futures = "0.3"
+serde_json = "1.0"
+wasmbus-rpc = "0.11"
+wasmcloud-interface-messaging = "0.8"
+thehaven_interfaces = { path = "../../Interfaces/thehaven-interfaces/rust" }
+jwt_provider = "1.0.15"
+wasmcloud-interface-sqldb = "0.8"
+chrono = {version = "0.4.23", features = ["serde"] }
+serde = {version = "1.0", features = ["derive"] }
+rust-argon2 = "0.5"
+wasmcloud-interface-numbergen = "0.8"
+
+[profile.release]
+# Optimize for small code size
+lto = true
+opt-level = "s"
+strip = true
