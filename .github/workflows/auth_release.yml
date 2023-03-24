@@ -1,4 +1,4 @@
-name: API Gateway Release to GHCR
+name: Auth Release to GHCR
 on:
   workflow_dispatch:
   push:
