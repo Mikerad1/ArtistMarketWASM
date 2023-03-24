@@ -182,6 +182,60 @@ pub fn decode_role(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Role, RpcEr
     };
     Ok(__result)
 }
+pub type Roles = Vec<Role>;
+
+// Encode Roles as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_roles<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &Roles,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.array(val.len() as u64)?;
+    for item in val.iter() {
+        encode_role(e, item)?;
+    }
+    Ok(())
+}
+
+// Decode Roles from cbor input stream
+#[doc(hidden)]
+pub fn decode_roles(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Roles, RpcError> {
+    let __result = {
+        if let Some(n) = d.array()? {
+            let mut arr: Vec<Role> = Vec::with_capacity(n as usize);
+            for _ in 0..(n as usize) {
+                arr.push(decode_role(d).map_err(|e| {
+                    format!(
+                        "decoding 'za.co.mfrtechnologies.wasminterfaces.auth#Role': {}",
+                        e
+                    )
+                })?)
+            }
+            arr
+        } else {
+            // indefinite array
+            let mut arr: Vec<Role> = Vec::new();
+            loop {
+                match d.datatype() {
+                    Err(_) => break,
+                    Ok(wasmbus_rpc::cbor::Type::Break) => break,
+                    Ok(_) => arr.push(decode_role(d).map_err(|e| {
+                        format!(
+                            "decoding 'za.co.mfrtechnologies.wasminterfaces.auth#Role': {}",
+                            e
+                        )
+                    })?),
+                }
+            }
+            arr
+        }
+    };
+    Ok(__result)
+}
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct User {
     #[serde(default)]
@@ -463,6 +517,8 @@ pub trait Auth {
         ctx: &Context,
         arg: &TS,
     ) -> RpcResult<Role>;
+    async fn get_roles(&self, ctx: &Context) -> RpcResult<Roles>;
+    async fn init_tables(&self, ctx: &Context) -> RpcResult<bool>;
 }
 
 /// AuthReceiver receives messages defined in the Auth service trait
@@ -495,6 +551,18 @@ pub trait AuthReceiver: MessageDispatch + Auth {
                     .map_err(|e| RpcError::Deser(format!("'String': {}", e)))?;
 
                 let resp = Auth::get_user_role(self, ctx, &value).await?;
+                let buf = wasmbus_rpc::common::serialize(&resp)?;
+
+                Ok(buf)
+            }
+            "GetRoles" => {
+                let resp = Auth::get_roles(self, ctx).await?;
+                let buf = wasmbus_rpc::common::serialize(&resp)?;
+
+                Ok(buf)
+            }
+            "InitTables" => {
+                let resp = Auth::init_tables(self, ctx).await?;
                 let buf = wasmbus_rpc::common::serialize(&resp)?;
 
                 Ok(buf)
@@ -611,6 +679,44 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> Auth for AuthSender<T
 
         let value: Role = wasmbus_rpc::common::deserialize(&resp)
             .map_err(|e| RpcError::Deser(format!("'{}': Role", e)))?;
+        Ok(value)
+    }
+    #[allow(unused)]
+    async fn get_roles(&self, ctx: &Context) -> RpcResult<Roles> {
+        let buf = *b"";
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Auth.GetRoles",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+
+        let value: Roles = wasmbus_rpc::common::deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("'{}': Roles", e)))?;
+        Ok(value)
+    }
+    #[allow(unused)]
+    async fn init_tables(&self, ctx: &Context) -> RpcResult<bool> {
+        let buf = *b"";
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "Auth.InitTables",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+
+        let value: bool = wasmbus_rpc::common::deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("'{}': Boolean", e)))?;
         Ok(value)
     }
 }

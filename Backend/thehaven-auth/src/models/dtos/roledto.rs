@@ -1,6 +1,6 @@
 pub(crate) mod roledto {
     use serde::{Serialize, Deserialize};
-    use crate::models::dbModels::role::role::RoleDB;
+    use crate::models::db_models::role::role::RoleDB;
 
     #[derive(Serialize, Deserialize)]
     pub struct RoleDTO{

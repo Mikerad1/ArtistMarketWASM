@@ -1,6 +1,5 @@
 pub(crate) mod user {
 
-    use chrono::Utc;
     use minicbor::{Decode, Encode};
     use wasmcloud_interface_sqldb::{minicbor, SqlDb, SqlDbError, SqlDbSender};
 
@@ -57,8 +56,8 @@ pub(crate) mod user {
                 username,
                 password,
                 email,
-                created_at: Utc::now().naive_utc().to_string(),
-                updated_at: Utc::now().naive_utc().to_string(),
+                created_at: time::OffsetDateTime::now_utc().to_string(),
+                updated_at: time::OffsetDateTime::now_utc().to_string(),
                 id_number,
                 first_name,
                 last_name,

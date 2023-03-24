@@ -12,7 +12,7 @@ use org.wasmcloud.model#wasmbus
 @wasmbus( actorReceive: true )
 service Auth {
   version: "0.1",
-  operations: [ Register, Login, GetUserRole ]
+  operations: [ Register, Login, GetUserRole, GetRoles, InitTables ]
 }
 
 ///Registers a user
@@ -32,6 +32,13 @@ operation GetUserRole {
     output: Role
 }
 
+operation GetRoles {
+    output: Roles
+}
+
+operation InitTables {
+    output: Boolean
+}
 
 structure User {
   @required
@@ -74,4 +81,8 @@ structure Role {
   id: String,
   @required
   name: String
+}
+
+list Roles {
+    member: Role
 }
